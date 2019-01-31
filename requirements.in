@@ -2,7 +2,6 @@ django
 django-govuk-template
 -e git+https://github.com/lgarvey/django-govuk-forms.git@master#egg=govuk_forms
 django-environ
-jira
 libsass
 requests
 requests_oauthlib

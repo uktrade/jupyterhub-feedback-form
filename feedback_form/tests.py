@@ -5,6 +5,7 @@ from django.test import TestCase, Client, override_settings
 from django.conf import settings
 
 from parameterized import parameterized
+import requests_mock
 
 from .forms import ChangeRequestForm
 
@@ -57,18 +58,18 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/auth/login/')
 
+    @requests_mock.mock()
     @patch('feedback_form.views.get_profile')
     @patch('authbroker_client.client.has_valid_token')
-    @patch('feedback_form.forms.create_jira_issue')
-    @override_settings(JIRA_ISSUE_URL='http://jira_url/?selectedIssue={}')
-    def test_successful_submission(self, mock_create_jira_issue, mock_has_valid_token, mock_get_profile):
+    def test_successful_submission(self, m, mock_has_valid_token, mock_get_profile):
         mock_has_valid_token.return_value = True
-        mock_create_jira_issue.return_value = 'FAKE-JIRA-ID'
+        m.post('https://desk.zendesk.com/api/v2/tickets.json', json={
+            'ticket': {
+                'id': 3543
+            }
+        })
 
         response = self.client.post('/', self.test_post_data)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/success/?issue=FAKE-JIRA-ID')
-
-        self.assertTrue(mock_create_jira_issue.called)
-        mock_create_jira_issue.assert_called_with(self.test_formatted_text, [])
+        self.assertEqual(response.url, '/success/?issue=3543')
