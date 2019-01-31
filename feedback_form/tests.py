@@ -32,14 +32,9 @@ class BaseTestCase(TestCase):
 
         self.test_formatted_text = (
             'Name: {name}\n'
-            'Department: {department}\n'
             'Email: {email}\n'
             'Telephone: {telephone}\n'
-            'Action: {action}\n'
-            'Description: {description}\n'
-            'Due date: {due_date}\n'
-            'Time due: {time_due}\n'
-            'Due date explanation: {date_explanation}').format(**test_data)
+            'Description: {description}').format(**test_data)
 
 
 class ChangeRequestFormTestCase(BaseTestCase):
@@ -47,19 +42,6 @@ class ChangeRequestFormTestCase(BaseTestCase):
 
         form = ChangeRequestForm(self.test_post_data)
         self.assertTrue(form.is_valid())
-
-    def test_date_in_future(self):
-        post_data = {
-            'due_date_0': dt.date.today().day - 1,
-            'due_date_1': dt.date.today().month,
-            'due_date_2': dt.date.today().year,
-        }
-
-        form = ChangeRequestForm(post_data)
-
-        self.assertFalse(form.is_valid())
-        self.assertIn('due_date', form.errors)
-        self.assertEqual(form.errors['due_date'], ['The date cannot be in the past'])
 
     def test_formatted_text(self):
         form = ChangeRequestForm(self.test_post_data)
@@ -144,6 +126,4 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
 
         self.assertTrue(mock_create_jira_issue.called)
         mock_create_jira_issue.assert_called_with(
-            settings.JIRA_CONTENT_PROJECT_ID, self.test_formatted_text, [], submitted_date,
-            customfield_11224='test dept', customfield_11225='test@test.com', customfield_11227='Mr Smith',
-            customfield_11228={'value': 'Add new content to Gov.uk'})
+            settings.JIRA_CONTENT_PROJECT_ID, self.test_formatted_text, [])

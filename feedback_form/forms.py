@@ -3,6 +3,7 @@ import datetime as dt
 
 from django import forms
 from django.conf import settings
+from django.utils.safestring import mark_safe
 from zenpy import Zenpy
 from zenpy.lib.api_objects import Ticket, CustomField, Comment
 
@@ -14,7 +15,7 @@ import requests
 from .fields import AVFileField
 
 
-def create_jira_issue(project_id, issue_text, attachments, due_date, **extra_fields):
+def create_jira_issue(project_id, issue_text, attachments, **extra_fields):
     jira_client = JIRA(
         settings.JIRA_URL,
         basic_auth=(settings.JIRA_USERNAME, settings.JIRA_PASSWORD))
@@ -26,9 +27,6 @@ def create_jira_issue(project_id, issue_text, attachments, due_date, **extra_fie
         'issuetype': {'name': 'Task'},
         'priority': {'name': 'Medium'},
     }
-
-    if due_date:
-        issue_dict['duedate'] = due_date
 
     if extra_fields:
         issue_dict.update(extra_fields)
@@ -79,13 +77,6 @@ class ChangeRequestForm(GOVUKForm):
         widget=widgets.TextInput()
     )
 
-    department = forms.CharField(
-        label='Your directorate/section',
-        max_length=255,
-        widget=widgets.TextInput(),
-        help_text='Your content must have approval from your team leader before submitting for upload.'
-    )
-
     email = forms.EmailField(
         label='Your email address',
         widget=widgets.TextInput()
@@ -95,7 +86,7 @@ class ChangeRequestForm(GOVUKForm):
         label='Phone number',
         max_length=255,
         widget=widgets.TextInput(),
-        help_text='Please provide a direct number in case we need to discuss your request.'
+        help_text='Please provide a direct number in case we need to discuss your feedback.'
     )
 
     action = forms.ChoiceField(
@@ -106,39 +97,22 @@ class ChangeRequestForm(GOVUKForm):
     )
 
     description = forms.CharField(
-        label='What is your content request? Please give as much detail as possible.',
+        label='What\'s your feedback?',
         widget=widgets.Textarea(),
-        help_text='Please outline your request, intended audience and its purpose '
-                  '(for example, to sell, to inform, to explain). '
-                  'For updating/deleting existing content, please provide URL.'
-    )
-
-    due_date = fields.SplitDateField(
-        label='Do you have a publication deadline?',
-        help_text='If so, give date and reason.',
-        required=False,
-        min_year=dt.date.today().year,
-        max_year=dt.date.today().year + 1,
-    )
-
-    time_due= forms.CharField(
-        label='Time due',
-        required=False,
-        max_length=100,
-        widget=widgets.TextInput(),
-    )
-
-    date_explanation = forms.CharField(
-        label='Reason',
-        widget=widgets.TextInput(),
-        required=False
+        help_text=mark_safe(
+            'If you\'re reporting a bug, please include'
+            '<ol>'
+            '<li>1. Enough step by step instructions for us to experience the bug: so we know what to fix.</li>'
+            '<li>2. What you\'ve already tried: we don\'t want to waste time by suggesting these.</li>'
+            '<li>3. Your aim: we may have an alternative.</li>'
+            '</ol>'
+        )
     )
 
     attachment1 = AVFileField(
-        label='Please attach the files containing the content you want to be uploaded',
+        label='Please attach screenshots or small data files. Do not submit sensitive data.',
         max_length=255,
         widget=widgets.ClearableFileInput(),
-        help_text='We accept Word documents with tracked changes - providing this will make the process very quick.',
         required=False
     )
 
@@ -174,36 +148,11 @@ class ChangeRequestForm(GOVUKForm):
         required=False
     )
 
-    def clean_due_date(self):
-        date = self.cleaned_data['due_date']
-        if date and date < dt.date.today():
-            raise forms.ValidationError('The date cannot be in the past')
-        return date
-
-    def get_custom_fields(self):
-        mapped = {}
-        for local_field, jira_field in JIRA_FIELD_MAPPING.items():
-            if isinstance(jira_field, dict):
-                # for select items jira requires the field to be in format:
-                # 'field': {'value': the_value}
-                mapped[jira_field['field']] = {
-                    'value': self.cleaned_data[local_field]
-                }
-            else:
-                mapped[jira_field] = self.cleaned_data[local_field]
-
-        return mapped
-
     def formatted_text(self):
         return ('Name: {name}\n'
-                'Department: {department}\n'
                 'Email: {email}\n'
                 'Telephone: {telephone}\n'
-                'Action: {action}\n'
-                'Description: {description}\n'
-                'Due date: {due_date}\n'
-                'Time due: {time_due}\n'
-                'Due date explanation: {date_explanation}'.format(**self.cleaned_data))
+                'Description: {description}'.format(**self.cleaned_data))
 
     def create_jira_issue(self):
 
@@ -212,8 +161,7 @@ class ChangeRequestForm(GOVUKForm):
         project_id = REASON_CHOICES_JIRA_PROJECT_MAP[self.cleaned_data['action']]
 
         jira_id = create_jira_issue(
-            project_id, self.formatted_text(), attachments, str(self.cleaned_data['due_date']),
-            **self.get_custom_fields())
+            project_id, self.formatted_text(), attachments)
 
         jira_url = settings.JIRA_ISSUE_URL.format(jira_id)
 
@@ -232,7 +180,6 @@ class ChangeRequestForm(GOVUKForm):
             CustomField(id=45522485, value=self.cleaned_data['email']),                 # email
             CustomField(id=360000188178, value=self.cleaned_data['telephone']),         # Phone number
             CustomField(id=360000182638, value=self.cleaned_data['action']),            # Content request
-            CustomField(id=360000180457, value=str(self.cleaned_data['due_date'])),     # due date
             CustomField(id=360000180477, value=self.cleaned_data['date_explanation']),  # reason
         }
 
