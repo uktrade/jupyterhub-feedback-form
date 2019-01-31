@@ -41,14 +41,6 @@ def create_jira_issue(issue_text, attachments, **extra_fields):
     return issue.key
 
 
-JIRA_FIELD_MAPPING = {
-    'name': 'customfield_11227',
-    'email': 'customfield_11225',
-    'department': 'customfield_11224',
-    'action': {'field': 'customfield_11228', 'type': 'select'}
-}
-
-
 class ChangeRequestForm(GOVUKForm):
     name = forms.CharField(
         label='Your full name',
