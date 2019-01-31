@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'govuk_template_base',
     'govuk_template',
     'govuk_forms',
-    'change_request_form',
+    'feedback_form',
     'raven.contrib.django.raven_compat',
 ]
 
