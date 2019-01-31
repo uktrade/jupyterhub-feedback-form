@@ -106,7 +106,7 @@ class ChangeRequestForm(GOVUKForm):
             CustomField(id=360000188178, value=self.cleaned_data['telephone']),         # Phone number
         }
 
-        ticket = zenpy_client.tickets.create(Ticket(
+        ticket_audit = zenpy_client.tickets.create(Ticket(
             subject='JupyterHub feedback',
             description=self.formatted_text(),
             custom_fields=custom_fields,
@@ -121,8 +121,8 @@ class ChangeRequestForm(GOVUKForm):
                 upload_instance = zenpy_client.attachments.upload(attachment.temporary_file_path())
                 uploads.append(upload_instance.token)
 
-            ticket.comment = Comment(body=str(attachment), uploads=uploads)
+            ticket_audit.ticket.comment = Comment(body=str(attachment), uploads=uploads)
 
-            zenpy_client.tickets.update(ticket)
+            zenpy_client.tickets.update(ticket_audit.ticket)
 
-        return ticket.id
+        return ticket_audit.ticket.id

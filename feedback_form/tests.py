@@ -65,8 +65,11 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
         mock_has_valid_token.return_value = True
         m.post('https://desk.zendesk.com/api/v2/tickets.json', json={
             'ticket': {
-                'id': 3543
-            }
+                'id': 3543,
+            },
+            'audit': {
+                'id': 1234,
+            },
         })
 
         response = self.client.post('/', self.test_post_data)
