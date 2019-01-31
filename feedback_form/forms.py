@@ -41,26 +41,6 @@ def create_jira_issue(issue_text, attachments, **extra_fields):
     return issue.key
 
 
-REASON_CHOICES = (
-    ('Add new content to Gov.uk', 'Add new content to Gov.uk'),
-    ('Update or remove content on Gov.uk', 'Update or remove content on Gov.uk'),
-    ('Add new content to Great.gov.uk', 'Add new content to Great.gov.uk'),
-    ('Update or remove content on Great.gov.uk', 'Update or remove content on Great.gov.uk'),
-    ('Add new content to Digital Workspace', 'Add new content to Digital Workspace'),
-    ('Update or remove content on Digital Workspace', 'Update or remove content on Digital Workspace'),
-)
-
-
-REASON_CHOICES_JIRA_PROJECT_MAP = {
-    'Add new content to Gov.uk': settings.JIRA_CONTENT_PROJECT_ID,
-    'Update or remove content on Gov.uk': settings.JIRA_CONTENT_PROJECT_ID,
-    'Add new content to Great.gov.uk': settings.JIRA_CONTENT_PROJECT_ID,
-    'Update or remove content on Great.gov.uk': settings.JIRA_CONTENT_PROJECT_ID,
-    'Add new content to Digital Workspace': settings.JIRA_WORKSPACE_PROJECT_ID,
-    'Update or remove content on Digital Workspace': settings.JIRA_WORKSPACE_PROJECT_ID,
-}
-
-
 JIRA_FIELD_MAPPING = {
     'name': 'customfield_11227',
     'email': 'customfield_11225',
