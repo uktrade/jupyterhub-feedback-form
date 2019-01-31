@@ -14,15 +14,9 @@ class BaseTestCase(TestCase):
     def setUp(self):
         self.test_post_data = {
             'name': 'Mr Smith',
-            'department': 'test dept',
             'email': 'test@test.com',
             'telephone': '07700 TEST',
             'description': 'a description',
-            'due_date_0': dt.date.today().day,
-            'due_date_1': dt.date.today().month,
-            'due_date_2': dt.date.today().year,
-            'date_explanation': 'ministerial visit',
-            'time_due': 'time due',
         }
 
         test_data = self.test_post_data.copy()
@@ -90,12 +84,6 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/success/?issue=FAKE-JIRA-ID')
-
-        submitted_date = '{}-{}-{}'.format(
-            str(self.test_post_data['due_date_2']),
-            str(self.test_post_data['due_date_1']).zfill(2),
-            str(self.test_post_data['due_date_0']).zfill(2),
-        )
 
         self.assertTrue(mock_create_jira_issue.called)
         mock_create_jira_issue.assert_called_with(self.test_formatted_text, [])
