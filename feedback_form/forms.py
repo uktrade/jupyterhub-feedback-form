@@ -101,7 +101,7 @@ class ChangeRequestForm(GOVUKForm):
         )
 
         custom_fields = {
-            CustomField(id=30041969, value='Content Delivery'),                         # service
+            CustomField(id=31281329, value='JupyterHub'),                         # service
             CustomField(id=45522485, value=self.cleaned_data['email']),                 # email
             CustomField(id=360000188178, value=self.cleaned_data['telephone']),         # Phone number
         }
@@ -110,7 +110,7 @@ class ChangeRequestForm(GOVUKForm):
             subject='JupyterHub feedback',
             description=self.formatted_text(),
             custom_fields=custom_fields,
-            tags=['content delivery']
+            tags=['jupyterhub']
         ))
 
         attachments = [value for field, value in self.cleaned_data.items() if field.startswith('attachment') and value]
