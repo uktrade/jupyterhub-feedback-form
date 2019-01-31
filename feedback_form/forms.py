@@ -30,7 +30,8 @@ class ChangeRequestForm(GOVUKForm):
         label='Phone number',
         max_length=255,
         widget=widgets.TextInput(),
-        help_text='Please provide a direct number in case we need to discuss your feedback.'
+        help_text='Please provide a direct number in case we need to discuss your feedback.',
+        required=False
     )
 
     description = forms.CharField(
