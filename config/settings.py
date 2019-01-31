@@ -140,7 +140,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 GOVUK_SERVICE_SETTINGS = {
-    'name': 'DIT Content request form',
+    'name': 'JupyterHub Feedback',
     'phase': 'beta',
     'header_link_view_name': 'home',
 }
