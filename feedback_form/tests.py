@@ -6,7 +6,7 @@ from django.conf import settings
 
 from parameterized import parameterized
 
-from .forms import ChangeRequestForm, REASON_CHOICES
+from .forms import ChangeRequestForm
 
 
 class BaseTestCase(TestCase):
@@ -17,7 +17,6 @@ class BaseTestCase(TestCase):
             'department': 'test dept',
             'email': 'test@test.com',
             'telephone': '07700 TEST',
-            'action': 'Add new content to Gov.uk',
             'description': 'a description',
             'due_date_0': dt.date.today().day,
             'due_date_1': dt.date.today().month,
@@ -66,32 +65,6 @@ class ChangeRequestFormTestCase(BaseTestCase):
 
         self.assertTrue(form.is_valid())
 
-    @parameterized.expand((action_id,) for action_id, _ in REASON_CHOICES)
-    @patch('feedback_form.forms.create_jira_issue')
-    def test_jira_project_id(self, action_id, mock_create_jira_issue):
-
-        mock_create_jira_issue.return_value = 'FAKE-JIRA-ID'
-
-        assert settings.JIRA_CONTENT_PROJECT_ID != settings.JIRA_WORKSPACE_PROJECT_ID
-
-        workspace_actions = [
-            'Add new content to Digital Workspace',
-            'Update or remove content on Digital Workspace'
-        ]
-
-        post_data = self.test_post_data.copy()
-        post_data['action'] = action_id
-
-        form = ChangeRequestForm(post_data)
-        self.assertTrue(form.is_valid())
-
-        form.create_jira_issue()
-
-        project_id = settings.JIRA_WORKSPACE_PROJECT_ID if action_id in workspace_actions \
-            else settings.JIRA_CONTENT_PROJECT_ID
-
-        self.assertEquals(mock_create_jira_issue.call_args[0][0], project_id)
-
 
 class ChangeRequestFormViewTestCase(BaseTestCase):
     def setUp(self):
@@ -125,5 +98,4 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
         )
 
         self.assertTrue(mock_create_jira_issue.called)
-        mock_create_jira_issue.assert_called_with(
-            settings.JIRA_CONTENT_PROJECT_ID, self.test_formatted_text, [])
+        mock_create_jira_issue.assert_called_with(self.test_formatted_text, [])

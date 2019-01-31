@@ -15,13 +15,12 @@ import requests
 from .fields import AVFileField
 
 
-def create_jira_issue(project_id, issue_text, attachments, **extra_fields):
+def create_jira_issue(issue_text, attachments, **extra_fields):
     jira_client = JIRA(
         settings.JIRA_URL,
         basic_auth=(settings.JIRA_USERNAME, settings.JIRA_PASSWORD))
 
     issue_dict = {
-        'project': {'id': project_id},
         'summary': 'New change request',
         'description': issue_text,
         'issuetype': {'name': 'Task'},
@@ -89,13 +88,6 @@ class ChangeRequestForm(GOVUKForm):
         help_text='Please provide a direct number in case we need to discuss your feedback.'
     )
 
-    action = forms.ChoiceField(
-        label='Do you want to add, update or remove content?',
-        choices=REASON_CHOICES,
-        help_text='Please allow a minimum of 3 working days to allow for feedback, approval and upload.',
-        widget=widgets.RadioSelect(),
-    )
-
     description = forms.CharField(
         label='What\'s your feedback?',
         widget=widgets.Textarea(),
@@ -158,10 +150,7 @@ class ChangeRequestForm(GOVUKForm):
 
         attachments = [value for field, value in self.cleaned_data.items() if field.startswith('attachment') if value]
 
-        project_id = REASON_CHOICES_JIRA_PROJECT_MAP[self.cleaned_data['action']]
-
-        jira_id = create_jira_issue(
-            project_id, self.formatted_text(), attachments)
+        jira_id = create_jira_issue(self.formatted_text(), attachments)
 
         jira_url = settings.JIRA_ISSUE_URL.format(jira_id)
 
