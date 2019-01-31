@@ -1,8 +1,8 @@
-# content-request-form
+# jupyterhub-feedback-form
 
 ## Overview
 
-A form to request content changes to GOV.UK / Great.gov.uk websites.  User access is controlled by the DIT authbroker/staff-sso, and submitted tickets are inserted into the content team's Jira board.
+A form to submit feedback on about JupyterHub/JupyterLab.
 
 
 ## Dependencies
