@@ -44,21 +44,6 @@ class ChangeRequestFormTestCase(BaseTestCase):
             form.formatted_text(),
             self.test_formatted_text)
 
-    def test_due_date_is_optional(self):
-        post_data = {k: v for k, v in self.test_post_data.items() if not k.startswith('due_date')}
-        form = ChangeRequestForm(post_data)
-
-        self.assertTrue(form.is_valid())
-
-    def test_no_future_limit_on_date(self):
-        year = dt.date.today().year
-        post_data = self.test_post_data.copy()
-
-        post_data['due_date_2'] = year + 1
-        form = ChangeRequestForm(post_data)
-
-        self.assertTrue(form.is_valid())
-
 
 class ChangeRequestFormViewTestCase(BaseTestCase):
     def setUp(self):
