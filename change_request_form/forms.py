@@ -44,18 +44,6 @@ def create_jira_issue(project_id, issue_text, attachments, due_date, **extra_fie
     return issue.key
 
 
-def slack_notify(message):
-    slack_message = json.dumps(
-        {
-            'text': message,
-            'username': 'contentbot',
-            'mrkdwn': True
-        }
-    ).encode()
-
-    requests.post(settings.SLACK_URL, data=slack_message)
-
-
 REASON_CHOICES = (
     ('Add new content to Gov.uk', 'Add new content to Gov.uk'),
     ('Update or remove content on Gov.uk', 'Update or remove content on Gov.uk'),
@@ -229,8 +217,6 @@ class ChangeRequestForm(GOVUKForm):
 
         jira_url = settings.JIRA_ISSUE_URL.format(jira_id)
 
-        slack_notify(f'new content request: {jira_url}')
-
         return jira_id
 
     def create_zendesk_ticket(self):
@@ -268,7 +254,5 @@ class ChangeRequestForm(GOVUKForm):
             ticket.comment = Comment(body=str(attachment), uploads=uploads)
 
             zenpy_client.tickets.update(ticket)
-
-        slack_notify(f'new content request: {ticket.id}')
 
         return ticket.id

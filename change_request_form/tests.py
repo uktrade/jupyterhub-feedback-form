@@ -86,8 +86,7 @@ class ChangeRequestFormTestCase(BaseTestCase):
 
     @parameterized.expand((action_id,) for action_id, _ in REASON_CHOICES)
     @patch('change_request_form.forms.create_jira_issue')
-    @patch('change_request_form.forms.slack_notify')
-    def test_jira_project_id(self, action_id, mock_slack_notify, mock_create_jira_issue):
+    def test_jira_project_id(self, action_id, mock_create_jira_issue):
 
         mock_create_jira_issue.return_value = 'FAKE-JIRA-ID'
 
@@ -127,9 +126,8 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
     @patch('change_request_form.views.get_profile')
     @patch('authbroker_client.client.has_valid_token')
     @patch('change_request_form.forms.create_jira_issue')
-    @patch('change_request_form.forms.slack_notify')
     @override_settings(JIRA_ISSUE_URL='http://jira_url/?selectedIssue={}')
-    def test_successful_submission(self, mock_slack_notify, mock_create_jira_issue, mock_has_valid_token, mock_get_profile):
+    def test_successful_submission(self, mock_create_jira_issue, mock_has_valid_token, mock_get_profile):
         mock_has_valid_token.return_value = True
         mock_create_jira_issue.return_value = 'FAKE-JIRA-ID'
 
@@ -137,9 +135,6 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/success/?issue=FAKE-JIRA-ID')
-        self.assertTrue(mock_slack_notify.called)
-        mock_slack_notify.call_args.assert_called_with(
-            'new content request:http://jira_url/?selectedIssue=FAKE-JIRA-ID')
 
         submitted_date = '{}-{}-{}'.format(
             str(self.test_post_data['due_date_2']),
