@@ -74,5 +74,10 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
 
         response = self.client.post('/', self.test_post_data)
 
+        self.assertEqual(m.request_history[0].json()['ticket']['requester'], {
+            'email': 'test@test.com',
+            'name': 'Mr Smith',
+            'id': None,
+        })
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/success/?issue=3543')

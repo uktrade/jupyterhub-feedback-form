@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from zenpy import Zenpy
-from zenpy.lib.api_objects import Ticket, CustomField, Comment
+from zenpy.lib.api_objects import Ticket, CustomField, Comment, User
 
 from govuk_forms.forms import GOVUKForm
 from govuk_forms import widgets, fields
@@ -110,7 +110,11 @@ class ChangeRequestForm(GOVUKForm):
             subject='JupyterHub feedback',
             description=self.formatted_text(),
             custom_fields=custom_fields,
-            tags=['jupyterhub']
+            tags=['jupyterhub'],
+            requester=User(
+                name=self.cleaned_data['name'],
+                email=self.cleaned_data['email'],
+            ),
         ))
 
         attachments = [value for field, value in self.cleaned_data.items() if field.startswith('attachment') and value]
