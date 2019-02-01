@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'govuk_template_base',
     'govuk_template',
     'govuk_forms',
-    'change_request_form',
+    'feedback_form',
     'raven.contrib.django.raven_compat',
 ]
 
@@ -140,7 +140,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 GOVUK_SERVICE_SETTINGS = {
-    'name': 'DIT Content request form',
+    'name': 'JupyterHub Feedback',
     'phase': 'beta',
     'header_link_view_name': 'home',
 }
@@ -150,15 +150,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 RAVEN_CONFIG = {
     'dsn': env('SENTRY_DSN')
 }
-
-# Jira config
-JIRA_URL = env('JIRA_URL')
-JIRA_USERNAME = env('JIRA_USERNAME')
-JIRA_PASSWORD = env('JIRA_PASSWORD')
-JIRA_CONTENT_PROJECT_ID = env('JIRA_PROJECT_ID')
-JIRA_WORKSPACE_PROJECT_ID = env('JIRA_WORKSPACE_PROJECT_ID')
-JIRA_ISSUE_URL = env('JIRA_ISSUE_URL')
-JIRA_WATCHERS = env.list('JIRA_WATCHERS')
 
 # Anti virus config
 AV_URL = env('AV_URL')
@@ -170,8 +161,6 @@ AUTHBROKER_URL = env('AUTHBROKER_URL')
 AUTHBROKER_CLIENT_ID = env('AUTHBROKER_CLIENT_ID')
 AUTHBROKER_CLIENT_SECRET = env('AUTHBROKER_CLIENT_SECRET')
 AUTHBROKER_SCOPES = 'read write'
-
-SLACK_URL = env('SLACK_URL')
 
 TEST_RUNNER = 'core.test_runner.DatabaselessTestRunner'
 
