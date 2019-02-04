@@ -75,10 +75,10 @@ class ChangeRequestForm(GOVUKForm):
             token=settings.ZENDESK_TOKEN,
         )
 
-        custom_fields = {
+        custom_fields = [
             CustomField(id=31281329, value='JupyterHub'),                         # service
             CustomField(id=45522485, value=self.cleaned_data['email']),                 # email         # Phone number
-        }
+        ]
 
         ticket_audit = zenpy_client.tickets.create(Ticket(
             subject='JupyterHub feedback',
