@@ -1,9 +1,11 @@
 import logging
 
+from django.shortcuts import redirect
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from oauthlib.oauth2 import TokenExpiredError
 
 from .forms import ChangeRequestForm
 from authbroker_client.client import authbroker_login_required, get_profile
@@ -18,17 +20,18 @@ class ChangeRequestFormView(FormView):
     form_class = ChangeRequestForm
     success_url = reverse_lazy('success')
 
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self._profile = get_profile(self.request)
+        except TokenExpiredError:
+            return redirect('authbroker_login')
+        else:
+            return super(ChangeRequestFormView, self).dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         initial = super().get_initial()
-
-        try:
-            profile = get_profile(self.request)
-
-            initial['email'] = profile['email']
-            initial['name'] = profile['first_name'] + ' ' + profile['last_name']
-        except Exception:
-            logger.exception('Cannot get user profile')
-
+        initial['email'] = self._profile['email']
+        initial['name'] = self._profile['first_name'] + ' ' + self._profile['last_name']
         return initial
 
     def form_valid(self, form):

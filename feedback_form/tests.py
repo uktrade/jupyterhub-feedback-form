@@ -16,7 +16,6 @@ class BaseTestCase(TestCase):
         self.test_post_data = {
             'name': 'Mr Smith',
             'email': 'test@test.com',
-            'telephone': '07700 TEST',
             'description': 'a description',
         }
 
@@ -27,23 +26,7 @@ class BaseTestCase(TestCase):
         self.test_formatted_text = (
             'Name: {name}\n'
             'Email: {email}\n'
-            'Telephone: {telephone}\n'
             'Description: {description}').format(**test_data)
-
-
-class ChangeRequestFormTestCase(BaseTestCase):
-    def test_valid_data(self):
-
-        form = ChangeRequestForm(self.test_post_data)
-        self.assertTrue(form.is_valid())
-
-    def test_formatted_text(self):
-        form = ChangeRequestForm(self.test_post_data)
-        form.is_valid()
-
-        self.assertEqual(
-            form.formatted_text(),
-            self.test_formatted_text)
 
 
 class ChangeRequestFormViewTestCase(BaseTestCase):
@@ -74,10 +57,20 @@ class ChangeRequestFormViewTestCase(BaseTestCase):
 
         response = self.client.post('/', self.test_post_data)
 
-        self.assertEqual(m.request_history[0].json()['ticket']['requester'], {
-            'email': 'test@test.com',
-            'name': 'Mr Smith',
+        self.assertEqual(m.request_history[0].json()['ticket'], {
+            'subject': 'JupyterHub feedback',
+            'tags': ['jupyterhub'],
+            'custom_fields': [
+                {'id': 31281329, 'value': 'JupyterHub'},
+                {'id': 45522485, 'value': 'test@test.com'},
+            ],
+            'description': self.test_formatted_text,
             'id': None,
+            'requester': {
+                'email': 'test@test.com',
+                'name': 'Mr Smith',
+                'id': None,    
+            }
         })
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/success/?issue=3543')

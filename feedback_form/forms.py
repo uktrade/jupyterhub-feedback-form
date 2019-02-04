@@ -26,14 +26,6 @@ class ChangeRequestForm(GOVUKForm):
         widget=widgets.TextInput()
     )
 
-    telephone = forms.CharField(
-        label='Phone number',
-        max_length=255,
-        widget=widgets.TextInput(),
-        help_text='Please provide a direct number in case we need to discuss your feedback.',
-        required=False
-    )
-
     description = forms.CharField(
         label='What\'s your feedback?',
         widget=widgets.Textarea(),
@@ -41,8 +33,8 @@ class ChangeRequestForm(GOVUKForm):
             'If you\'re reporting a bug, please include'
             '<ol>'
             '<li>1. Enough step by step instructions for us to experience the bug: so we know what to fix.</li>'
-            '<li>2. What you\'ve already tried: we don\'t want to waste time by suggesting these.</li>'
-            '<li>3. Your aim: we may have an alternative.</li>'
+            '<li>2. What you\'ve already tried.</li>'
+            '<li>3. Your aim: the platform may have an alternative.</li>'
             '</ol>'
         )
     )
@@ -70,29 +62,6 @@ class ChangeRequestForm(GOVUKForm):
         required=False
     )
 
-    attachment4 = AVFileField(
-        label='',
-        max_length=255,
-        widget=widgets.ClearableFileInput(),
-        help_text='',
-        required=False
-    )
-
-    attachment5 = AVFileField(
-        label='',
-        max_length=255,
-        widget=widgets.ClearableFileInput(),
-        help_text='',
-        required=False
-    )
-
-    def formatted_text(self):
-        return ('Name: {name}\n'
-                'Email: {email}\n'
-                'Telephone: {telephone}\n'
-                'Description: {description}'.format(**self.cleaned_data))
-
-
     def create_zendesk_ticket(self):
         zenpy_client = Zenpy(
             subdomain=settings.ZENDESK_SUBDOMAIN,
@@ -100,15 +69,20 @@ class ChangeRequestForm(GOVUKForm):
             token=settings.ZENDESK_TOKEN,
         )
 
-        custom_fields = {
+        custom_fields = [
             CustomField(id=31281329, value='JupyterHub'),                         # service
-            CustomField(id=45522485, value=self.cleaned_data['email']),                 # email
-            CustomField(id=360000188178, value=self.cleaned_data['telephone']),         # Phone number
-        }
+            CustomField(id=45522485, value=self.cleaned_data['email']),                 # email         # Phone number
+        ]
+
+        formatted_text = (
+            'Name: {name}\n'
+            'Email: {email}\n'
+            'Description: {description}'.format(**self.cleaned_data)
+        )
 
         ticket_audit = zenpy_client.tickets.create(Ticket(
             subject='JupyterHub feedback',
-            description=self.formatted_text(),
+            description=formatted_text,
             custom_fields=custom_fields,
             tags=['jupyterhub'],
             requester=User(
