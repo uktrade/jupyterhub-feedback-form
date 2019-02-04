@@ -41,8 +41,8 @@ class ChangeRequestForm(GOVUKForm):
             'If you\'re reporting a bug, please include'
             '<ol>'
             '<li>1. Enough step by step instructions for us to experience the bug: so we know what to fix.</li>'
-            '<li>2. What you\'ve already tried: we don\'t want to waste time by suggesting these.</li>'
-            '<li>3. Your aim: we may have an alternative.</li>'
+            '<li>2. What you\'ve already tried.</li>'
+            '<li>3. Your aim: the platform may have an alternative.</li>'
             '</ol>'
         )
     )
