@@ -62,12 +62,6 @@ class ChangeRequestForm(GOVUKForm):
         required=False
     )
 
-    def formatted_text(self):
-        return ('Name: {name}\n'
-                'Email: {email}\n'
-                'Description: {description}'.format(**self.cleaned_data))
-
-
     def create_zendesk_ticket(self):
         zenpy_client = Zenpy(
             subdomain=settings.ZENDESK_SUBDOMAIN,
@@ -80,9 +74,15 @@ class ChangeRequestForm(GOVUKForm):
             CustomField(id=45522485, value=self.cleaned_data['email']),                 # email         # Phone number
         ]
 
+        formatted_text = (
+            'Name: {name}\n'
+            'Email: {email}\n'
+            'Description: {description}'.format(**self.cleaned_data)
+        )
+
         ticket_audit = zenpy_client.tickets.create(Ticket(
             subject='JupyterHub feedback',
-            description=self.formatted_text(),
+            description=formatted_text,
             custom_fields=custom_fields,
             tags=['jupyterhub'],
             requester=User(
