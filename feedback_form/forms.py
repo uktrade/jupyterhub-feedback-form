@@ -26,14 +26,6 @@ class ChangeRequestForm(GOVUKForm):
         widget=widgets.TextInput()
     )
 
-    telephone = forms.CharField(
-        label='Phone number',
-        max_length=255,
-        widget=widgets.TextInput(),
-        help_text='Please provide a direct number in case we need to discuss your feedback.',
-        required=False
-    )
-
     description = forms.CharField(
         label='What\'s your feedback?',
         widget=widgets.Textarea(),
@@ -73,7 +65,6 @@ class ChangeRequestForm(GOVUKForm):
     def formatted_text(self):
         return ('Name: {name}\n'
                 'Email: {email}\n'
-                'Telephone: {telephone}\n'
                 'Description: {description}'.format(**self.cleaned_data))
 
 
@@ -86,8 +77,7 @@ class ChangeRequestForm(GOVUKForm):
 
         custom_fields = {
             CustomField(id=31281329, value='JupyterHub'),                         # service
-            CustomField(id=45522485, value=self.cleaned_data['email']),                 # email
-            CustomField(id=360000188178, value=self.cleaned_data['telephone']),         # Phone number
+            CustomField(id=45522485, value=self.cleaned_data['email']),                 # email         # Phone number
         }
 
         ticket_audit = zenpy_client.tickets.create(Ticket(

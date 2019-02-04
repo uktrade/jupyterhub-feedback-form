@@ -16,7 +16,6 @@ class BaseTestCase(TestCase):
         self.test_post_data = {
             'name': 'Mr Smith',
             'email': 'test@test.com',
-            'telephone': '07700 TEST',
             'description': 'a description',
         }
 
@@ -27,7 +26,6 @@ class BaseTestCase(TestCase):
         self.test_formatted_text = (
             'Name: {name}\n'
             'Email: {email}\n'
-            'Telephone: {telephone}\n'
             'Description: {description}').format(**test_data)
 
 
