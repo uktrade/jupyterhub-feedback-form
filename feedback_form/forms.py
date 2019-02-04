@@ -70,22 +70,6 @@ class ChangeRequestForm(GOVUKForm):
         required=False
     )
 
-    attachment4 = AVFileField(
-        label='',
-        max_length=255,
-        widget=widgets.ClearableFileInput(),
-        help_text='',
-        required=False
-    )
-
-    attachment5 = AVFileField(
-        label='',
-        max_length=255,
-        widget=widgets.ClearableFileInput(),
-        help_text='',
-        required=False
-    )
-
     def formatted_text(self):
         return ('Name: {name}\n'
                 'Email: {email}\n'
