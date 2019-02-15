@@ -30,7 +30,7 @@ class AuthCallbackView(View):
         state = self.request.session.get(TOKEN_SESSION_KEY + '_oauth_state', None)
 
         if not state:
-            return HttpResponseServerError()
+            return HttpResponseServerError('Unable to find state in session')
 
         try:
             token = get_client(self.request).fetch_token(
