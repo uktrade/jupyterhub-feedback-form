@@ -5,7 +5,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from oauthlib.oauth2 import TokenExpiredError
+from oauthlib.oauth2.rfc6749.errors import TokenExpiredError
 
 from .forms import ChangeRequestForm
 from authbroker_client.client import authbroker_login_required, get_profile
